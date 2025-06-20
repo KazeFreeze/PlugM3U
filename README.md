@@ -2,64 +2,9 @@
 
 This is a configurable Stremio addon that provides IPTV channels from multiple .m3u files. It includes a web interface to let users select which playlists to load.
 
-## Directory Structure
+Configuring and Installing in Stremio
 
-.
-├── m3u/ # Folder for your .m3u playlist files
-│ ├── entertainment.m3u
-│ └── movies.m3u
-├── public/ # Folder for the web UI
-│ └── index.html
-├── addon.js # Core addon logic (dynamic manifest, handlers)
-├── package.json # Project dependencies and scripts
-├── README.md # This file
-└── server.js # Express server to host the addon and UI
-
-## How to Test Locally
-
-### 1. Prerequisites
-
-- You must have Node.js installed on your computer.
-- You must have the Stremio Desktop App installed.
-
-### 2. Setup
-
-**Create the Project Directory:**
-
-- Create a new folder for your project.
-
-**Create Sub-directories:**
-
-- Inside the new folder, create two more folders: `m3u` and `public`.
-
-**Save the Files:**
-
-- Save all the files from the canvases above into their correct locations.
-  - `server.js`, `addon.js`, `package.json`, `README.md` go in the root project folder.
-  - `index.html` goes inside the `public` folder.
-  - Your `.m3u` files go inside the `m3u` folder.
-
-**Install Dependencies:**
-
-- Open your terminal or command prompt in the root project directory and run:
-
-  npm install
-
-### 3. Running the Addon
-
-**Start the Server:**
-
-- In the same terminal, run the following command:
-
-  npm start
-
-- You should see a message in the console: `Addon server running. Open http://localhost:7000 to configure.`
-
-### 4. Configuring and Installing in Stremio
-
-**Open the Web UI:**
-
-- Open your web browser and navigate to `http://localhost:7000`.
+**Open the Web UI**
 
 **Select Playlists:**
 
@@ -88,7 +33,3 @@ This is a configurable Stremio addon that provides IPTV channels from multiple .
 **Find Your Catalog:**
 
 - You should see a new catalog whose name includes the playlists you selected (e.g., "IPTV (Entertainment, Movies)"). Click on it to see the combined list of channels.
-
----
-
-**Congratulations!** You now have a flexible, configurable Stremio addon.
