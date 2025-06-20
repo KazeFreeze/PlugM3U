@@ -13,7 +13,7 @@
         position: relative;
         display: inline-block;
       }
-      .tooltip .tooltiptext {
+      .tooltip.tooltiptext {
         visibility: hidden;
         width: 140px;
         background-color: #555;
@@ -29,7 +29,7 @@
         opacity: 0;
         transition: opacity 0.3s;
       }
-      .tooltip .tooltiptext::after {
+      .tooltip.tooltiptext::after {
         content: "";
         position: absolute;
         top: 100%;
@@ -39,7 +39,7 @@
         border-style: solid;
         border-color: #555 transparent transparent transparent;
       }
-      .tooltip:hover .tooltiptext {
+      .tooltip:hover.tooltiptext {
         visibility: visible;
         opacity: 1;
       }
@@ -115,13 +115,13 @@
         const copyBtn = document.getElementById("copy-btn");
         const copyTooltip = document.getElementById("copy-tooltip");
 
-        // Fetch available M3U files from the server
+        // Fetch available M3U files from the server's API endpoint.
         fetch("/api/files")
           .then((response) => response.json())
           .then((files) => {
             if (files.length === 0) {
               fileListContainer.innerHTML =
-                '<p class="text-center text-red-400">No .m3u files found in the `m3u` directory.</p>';
+                '<p class="text-center text-red-400">No.m3u files found in the `m3u` directory.</p>';
               generateBtn.disabled = true;
               return;
             }
@@ -133,11 +133,11 @@
                 .replace(/[-_]/g, " ")
                 .replace(/\b\w/g, (l) => l.toUpperCase());
               fileCheckboxesHTML += `
-                            <label for="${file}" class="flex items-center bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-gray-600 transition">
-                                <input type="checkbox" id="${file}" name="m3u-file" value="${file}" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                <span class="ml-3 text-lg">${displayName}</span>
-                            </label>
-                        `;
+                <label for="${file}" class="flex items-center bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-gray-600 transition">
+                    <input type="checkbox" id="${file}" name="m3u-file" value="${file}" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <span class="ml-3 text-lg">${displayName}</span>
+                </label>
+              `;
             });
             fileCheckboxesHTML += "</div>";
             fileListContainer.innerHTML = fileCheckboxesHTML;
@@ -166,6 +166,7 @@
             fullUrl
           )}`;
 
+          // Display the results section.
           resultContainer.style.display = "block";
         });
 
