@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stremio IPTV Addon Configuration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 140px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -70px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+      }
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-900 text-white flex items-center justify-center min-h-screen"
+  >
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg">
+      <h1 class="text-3xl font-bold text-center mb-2">IPTV Addon Setup</h1>
+      <p class="text-center text-gray-400 mb-6">
+        Select the M3U playlists you want to include in your Stremio addon.
+      </p>
+
+      <div id="file-list-container" class="mb-6">
+        <p class="text-center text-gray-500">Loading playlists...</p>
+      </div>
+
+      <button
+        id="generate-btn"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
+      >
+        Generate Install Link
+      </button>
+
+      <div
+        id="result-container"
+        class="mt-6 p-4 bg-gray-900 rounded-lg text-center"
+        style="display: none"
+      >
+        <p class="font-semibold mb-2">Your addon is ready!</p>
+        <p class="text-sm text-gray-400 mb-4">
+          Click the link below to install, or copy/paste it into Stremio's
+          search bar.
+        </p>
+
+        <div class="flex items-center space-x-2 bg-gray-800 p-2 rounded-lg">
+          <input
+            id="install-url"
+            type="text"
+            readonly
+            class="flex-grow bg-transparent text-gray-300 focus:outline-none"
+          />
+          <div class="tooltip">
+            <button
+              id="copy-btn"
+              class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-3 rounded-md"
+            >
+              Copy
+            </button>
+            <span class="tooltiptext" id="copy-tooltip">Copy to clipboard</span>
+          </div>
+        </div>
+        <a
+          id="install-link"
+          href="#"
+          class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mt-4"
+        >
+          Install in Stremio
+        </a>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const fileListContainer = document.getElementById(
+          "file-list-container"
+        );
+        const generateBtn = document.getElementById("generate-btn");
+        const resultContainer = document.getElementById("result-container");
+        const installUrlInput = document.getElementById("install-url");
+        const installLink = document.getElementById("install-link");
+        const copyBtn = document.getElementById("copy-btn");
+        const copyTooltip = document.getElementById("copy-tooltip");
+
+        // Fetch available M3U files from the server
+        fetch("/api/files")
+          .then((response) => response.json())
+          .then((files) => {
+            if (files.length === 0) {
+              fileListContainer.innerHTML =
+                '<p class="text-center text-red-400">No .m3u files found in the `m3u` directory.</p>';
+              generateBtn.disabled = true;
+              return;
+            }
+
+            let fileCheckboxesHTML = '<div class="space-y-3">';
+            files.forEach((file) => {
+              const displayName = file
+                .replace(".m3u", "")
+                .replace(/[-_]/g, " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase());
+              fileCheckboxesHTML += `
+                            <label for="${file}" class="flex items-center bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-gray-600 transition">
+                                <input type="checkbox" id="${file}" name="m3u-file" value="${file}" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-3 text-lg">${displayName}</span>
+                            </label>
+                        `;
+            });
+            fileCheckboxesHTML += "</div>";
+            fileListContainer.innerHTML = fileCheckboxesHTML;
+          })
+          .catch((error) => {
+            console.error("Error fetching file list:", error);
+            fileListContainer.innerHTML =
+              '<p class="text-center text-red-400">Failed to load playlists. Make sure the server is running.</p>';
+          });
+
+        generateBtn.addEventListener("click", () => {
+          const selectedFiles = Array.from(
+            document.querySelectorAll('input[name="m3u-file"]:checked')
+          ).map((cb) => cb.value);
+
+          if (selectedFiles.length === 0) {
+            alert("Please select at least one playlist.");
+            return;
+          }
+
+          const baseUrl = `${window.location.origin}/manifest.json`;
+          const fullUrl = `${baseUrl}?files=${selectedFiles.join(",")}`;
+
+          installUrlInput.value = fullUrl;
+          installLink.href = `stremio://install?url=${encodeURIComponent(
+            fullUrl
+          )}`;
+
+          resultContainer.style.display = "block";
+        });
+
+        copyBtn.addEventListener("click", () => {
+          installUrlInput.select();
+          document.execCommand("copy");
+          copyTooltip.textContent = "Copied!";
+          setTimeout(() => {
+            copyTooltip.textContent = "Copy to clipboard";
+          }, 2000);
+        });
+      });
+    </script>
+  </body>
+</html>

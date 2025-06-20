@@ -1,0 +1,11 @@
+# Node modules
+node_modules/
+
+# Optional logs/temp files
+npm-debug.log*
+.DS_Store
+.env
+
+# Ignore user-specific editor configs (optional)
+.vscode/
+.idea/
