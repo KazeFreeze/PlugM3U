@@ -1,5 +1,5 @@
 {
-  "name": "PlugM3U",
+  "name": "plugm3u",
   "version": "1.0.0",
   "description": "A lightweight Stremio addon for IPTV streams from an M3U file.",
   "main": "server.js",
